@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '8.0' # Substitua pela sua versão específica do .NET Core
+        dotnet-version: '6.0' # Substitua pela sua versão específica do .NET
 
     - name: Restore dependencies
       run: dotnet restore
@@ -24,8 +24,20 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c Release
 
-    - name: Test Unit Tests
-      run: dotnet test ./Api.Server.Unit.Test/Api.Server.Unit.Test.csproj --no-restore --verbosity normal
+    - name: Start Application
+      run: dotnet run --project ./Api.Server/Api.Server.csproj --urls "http://localhost:5150" &
+      shell: bash
+
+    - name: Wait for Application to Start
+      run: sleep 10 # Ajuste este tempo conforme necessário para sua aplicação iniciar
 
     - name: Test Integration Tests
       run: dotnet test ./Api.Server.Integration.Test/Api.Server.Integration.Test.csproj --no-restore --verbosity normal
+
+    - name: Shutdown Application
+      if: always()
+      run: kill $(jobs -p) || true
+      shell: bash
+
+    - name: Test Unit Tests
+      run: dotnet test ./Api.Server.Unit.Test/Api.Server.Unit.Test.csproj --no-restore --verbosity normal
