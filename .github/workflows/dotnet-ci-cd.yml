@@ -1,0 +1,31 @@
+name: .NET CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0' # Substitua pela sua versão específica do .NET Core
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore -c Release
+
+    - name: Test Unit Tests
+      run: dotnet test ./Api.Server.Unit.Test/Api.Server.Unit.Test.csproj --no-restore --verbosity normal
+
+    - name: Test Integration Tests
+      run: dotnet test ./Api.Server.Integration.Test/Api.Server.Integration.Test.csproj --no-restore --verbosity normal
