@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 767398007556.dkr.ecr.us-east-1.amazonaws.com/apiserver
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t apiserver -f Api.Server/Dockerfile .
+      - docker tag apiserver:latest 767398007556.dkr.ecr.us-east-1.amazonaws.com/apiserver:latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push 767398007556.dkr.ecr.us-east-1.amazonaws.com/apiserver:latest
