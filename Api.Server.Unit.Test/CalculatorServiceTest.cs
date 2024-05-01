@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Api.Server.Integration.Test
+namespace Api.Server.Unit.Test
 {
     public class CalculatorServiceTest
     {

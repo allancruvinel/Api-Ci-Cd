@@ -1,21 +1,33 @@
+using Api.Server.Controllers;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Newtonsoft.Json;
 using System.Net;
 
 namespace Api.Server.Integration.Test
 {
-    public class ServerControllerTests
+    public class ServerControllerTests : IClassFixture<WebApplicationFactory<Program>>
     {
-
-        private readonly HttpClient httpClient = new() { BaseAddress = new Uri("http://localhost:5150") };
+        private readonly WebApplicationFactory<Program> _factory;
+        private HttpClient? client;
+        public ServerControllerTests(WebApplicationFactory<Program> factory)
+        {
+            _factory = factory;
+            client = _factory.CreateClient();
+        }
         [Fact]
         public async Task TestIfGetUserIsReturningUserAsync()
         {
             // Substitua "http://localhost:5000" pelo URL da sua API.
             //httpClient.BaseAddress = new System.Uri("http://localhost:5000");
-
+            client = _factory.CreateClient();
             // Faz a requisição para o endpoint
-            var response = await httpClient.GetAsync("/server/user");
+            var response = await client.GetAsync("/server/user");
 
+
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
             // Verifica se o status code é 200 OK
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -37,7 +49,7 @@ namespace Api.Server.Integration.Test
             //httpClient.BaseAddress = new System.Uri("http://localhost:5000");
 
             // Faz a requisição para o endpoint
-            var response = await httpClient.GetAsync("/server/user");
+            var response = await client.GetAsync("/server/user");
 
             // Verifica se o status code é 200 OK
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
