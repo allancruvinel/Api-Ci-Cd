@@ -15,10 +15,10 @@ namespace Api.Server.Controllers
         [Route("user")]
         public IActionResult Index()
         {
-            int resultSum = calculatorService.SumNumbers(10, 10);
+            int resultSum = calculatorService.SumNumbers(10, 9);
             dynamic result = new
             {
-                name = "Eduardo-comitado",
+                name = "Eduardo",
                 age = resultSum
             };
 
