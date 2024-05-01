@@ -23,7 +23,7 @@ jobs:
       run: dotnet build --no-restore -c Release
       
     - name: Test Unit Tests
-      run: dotnet test ./Api.Server.Unit.Test/Api.Server.Unit.Test.csproj --no-restore --verbosity minimal
+      run: dotnet test ./Api.Server.Unit.Test/Api.Server.Unit.Test.csproj --no-restore --verbosity normal
 
     - name: Test Integration Tests
-      run: dotnet test ./Api.Server.Integration.Test/Api.Server.Integration.Test.csproj --no-restore --verbosity minimal
+      run: dotnet test ./Api.Server.Integration.Test/Api.Server.Integration.Test.csproj --no-restore --verbosity normal
