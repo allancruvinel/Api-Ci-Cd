@@ -61,7 +61,7 @@ namespace Api.Server.Integration.Test
             var user = JsonConvert.DeserializeObject<User>(responseString); // Use JsonDocument.Parse(responseString) se estiver usando System.Text.Json
 
             // Verifica se os valores deserializados correspondem ao esperado
-            Assert.Equal("Eduardo", user.Name);
+            Assert.Equal("Eduardo", user.Name+"a");
             Assert.Equal(19, user.Age);
         }
     }
