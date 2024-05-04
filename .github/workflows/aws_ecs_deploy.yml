@@ -71,18 +71,22 @@ jobs:
         docker push 767398007556.dkr.ecr.us-east-1.amazonaws.com/api-server:latest
         echo "image= 767398007556.dkr.ecr.us-east-1.amazonaws.com/api-server:latest" >> $GITHUB_OUTPUT
 
+    - name: Download task definition
+      run: |
+        aws ecs describe-task-definition --task-definition tarefa-api-server:13 --query taskDefinition > task-definition.json
+
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: secrets.TASK_DEFINITION
+        task-definition: task-definition.json
         container-name: container-ecr-api-server
         image: 767398007556.dkr.ecr.us-east-1.amazonaws.com/api-server:latest
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
-        task-definition: secrets.TASK_DEFINITION
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: Api-server-ultimate
         cluster: Api-cluster-ultimate
         wait-for-service-stability: true
