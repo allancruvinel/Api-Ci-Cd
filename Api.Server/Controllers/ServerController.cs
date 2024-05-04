@@ -1,4 +1,4 @@
-using Api.Server.Interfaces;
+nusing Api.Server.Interfaces;
 using Api.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +18,7 @@ namespace Api.Server.Controllers
             int resultSum = calculatorService.SumNumbers(10, 9);
             dynamic result = new
             {
-                name = "Eduardo",
+                name = "Eduardo e monica",
                 age = resultSum,
                 deploy = "0023"
             };
