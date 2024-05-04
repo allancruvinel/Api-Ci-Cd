@@ -18,7 +18,7 @@ namespace Api.Server.Controllers
             int resultSum = calculatorService.SumNumbers(10, 9);
             dynamic result = new
             {
-                name = "Eduardo e monica",
+                name = "Eduardo",
                 age = resultSum,
                 deploy = "0023"
             };
