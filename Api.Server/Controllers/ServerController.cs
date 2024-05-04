@@ -19,7 +19,8 @@ namespace Api.Server.Controllers
             dynamic result = new
             {
                 name = "Eduardo",
-                age = resultSum
+                age = resultSum,
+                deploy = "0023"
             };
 
             return Ok(result);
