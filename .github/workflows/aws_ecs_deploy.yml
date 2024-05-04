@@ -48,10 +48,6 @@ jobs:
     - name: Test Integration Tests
       run: dotnet test ./Api.Server.Integration.Test/Api.Server.Integration.Test.csproj --no-restore --verbosity normal
 
-    - name: Check Test Results
-      id: check-tests
-      run: echo "::set-output name=tests-passed::$(if [ $? == 0 ]; then echo true; else echo false; fi)"
-
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       if: steps.check-tests.outputs.tests-passed == 'true'
