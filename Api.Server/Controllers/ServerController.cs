@@ -19,7 +19,7 @@ namespace Api.Server.Controllers
             dynamic result = new
             {
                 name = "Eduardo e dominic",
-                age = resultSum
+                age = resultSum,
             };
 
             return Ok(result);

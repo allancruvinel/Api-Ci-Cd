@@ -1,0 +1,84 @@
+name: Test and Deploy to Amazon ECS
+
+on:
+  push:
+    branches: [ "insira/suabranchAqui" ]
+
+env:
+  AWS_REGION: secrets.AWS_REGION
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0' # Substitua pela sua versão específica do .NET
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore -c Release
+      
+    - name: Test Unit Tests
+      run: dotnet test ./Api.Server.Unit.Test/Api.Server.Unit.Test.csproj --no-restore --verbosity normal
+
+    - name: Test Integration Tests
+      run: dotnet test ./Api.Server.Integration.Test/Api.Server.Integration.Test.csproj --no-restore --verbosity normal
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      if: steps.check-tests.outputs.tests-passed == 'true'
+      env:
+        ECR_REGISTRY: IMAGEMAQUI
+        IMAGE_TAG: TAGAQUI
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t api-server -f Api.Server/Dockerfile .
+        docker tag api-server:latest 767398007556.dkr.ecr.us-east-1.amazonaws.com/api-server:latest
+        docker push 767398007556.dkr.ecr.us-east-1.amazonaws.com/api-server:latest
+        echo "image= 767398007556.dkr.ecr.us-east-1.amazonaws.com/api-server:latest" >> $GITHUB_OUTPUT
+
+    - name: Download task definition
+      run: |
+        aws ecs describe-task-definition --task-definition tarefa-api-server --query taskDefinition > task-definition.json
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        container-name: container-ecr-api-server
+        image: 767398007556.dkr.ecr.us-east-1.amazonaws.com/api-server:latest
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: Api-server-ultimate
+        cluster: Api-cluster-ultimate
+        wait-for-service-stability: true
